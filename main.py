@@ -12,7 +12,7 @@ def scale_image(image_to_rescale: Image, width: int) -> Image:
 
     return image_to_rescale.resize(new_size, Image.Resampling.NEAREST)
 
-@st.cache
+@st.cache_data
 def load_skin(username: str) -> Image:
     player_image_response = requests.get(MC_SKIN_RENDER_URL + username_input)
 
@@ -23,28 +23,37 @@ def load_skin(username: str) -> Image:
 
     return player_image
 
-def create_hand_card(username_input: str, description: str = "", player_image_width: int = 32):
-    # Setup
-    hand_card = Image.open("template_hand.png")
+@st.cache_data
+def load_description(description: str) -> Image:
     font = ImageFont.truetype("minecraftFont.ttf", 16)
-    titleFont = ImageFont.truetype("minecraftFont.ttf", 32)
-
-    # Retrieving and scaling the player image
-    player_image = load_skin(username_input)
-
-    player_image = scale_image(player_image, player_image_width).convert("RGBA")
-
-    # Writing the description
     description_image = Image.new("RGBA", (144, 120))
 
     temp_draw = ImageDraw.Draw(description_image)
     temp_draw.text((0, 0), description, font=font)
 
-    # Writing the username
+    return description_image
+
+@st.cache_data
+def load_username(username: str) -> Image:
+    titleFont = ImageFont.truetype("minecraftFont.ttf", 32)
     username_image = Image.new("RGBA", (176, 24))
 
     temp_draw = ImageDraw.Draw(username_image)
     temp_draw.text((0, 0), username_input, font=titleFont)
+
+    return username_image
+
+@st.cache_data
+def create_hand_card(username_input: str, description: str = "", player_image_width: int = 32):
+    # Setup
+    hand_card = Image.open("template_hand.png")
+
+    # Retrieving the components
+    player_image = load_skin(username_input)
+    player_image = scale_image(player_image, player_image_width).convert("RGBA")
+
+    description_image = load_description(description)
+    username_image = load_username(username_input)
 
     # Assembling the image
     player_image_x = int(192 + (128 - player_image.size[0]) / 2)
