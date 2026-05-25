@@ -1,4 +1,6 @@
 import io
+from email.policy import default
+
 import streamlit as st
 from PIL import Image, ImageFont, ImageDraw
 import requests
@@ -10,6 +12,7 @@ def scale_image(image_to_rescale: Image, width: int) -> Image:
 
     return image_to_rescale.resize(new_size, Image.Resampling.NEAREST)
 
+@st.cache
 def load_skin(username: str) -> Image:
     player_image_response = requests.get(MC_SKIN_RENDER_URL + username_input)
 
@@ -23,8 +26,8 @@ def load_skin(username: str) -> Image:
 def create_hand_card(username_input: str, description: str = "", player_image_width: int = 32):
     # Setup
     hand_card = Image.open("template_hand.png")
-    font = ImageFont.truetype("minecraftFont.ttf", 12)
-    titleFont = ImageFont.truetype("minecraftFont.ttf", 16)
+    font = ImageFont.truetype("minecraftFont.ttf", 16)
+    titleFont = ImageFont.truetype("minecraftFont.ttf", 32)
 
     # Retrieving and scaling the player image
     player_image = load_skin(username_input)
@@ -32,24 +35,24 @@ def create_hand_card(username_input: str, description: str = "", player_image_wi
     player_image = scale_image(player_image, player_image_width).convert("RGBA")
 
     # Writing the description
-    description_image = Image.new("RGBA", (72, 60))
+    description_image = Image.new("RGBA", (144, 120))
 
     temp_draw = ImageDraw.Draw(description_image)
     temp_draw.text((0, 0), description, font=font)
 
     # Writing the username
-    username_image = Image.new("RGBA", (88, 12))
+    username_image = Image.new("RGBA", (176, 24))
 
     temp_draw = ImageDraw.Draw(username_image)
     temp_draw.text((0, 0), username_input, font=titleFont)
 
     # Assembling the image
-    player_image_x = int(96 + (64 - player_image.size[0]) / 2)
-    player_image_y = int(56 + (80 - player_image.size[1]) / 2)
+    player_image_x = int(192 + (128 - player_image.size[0]) / 2)
+    player_image_y = int(112 + (160 - player_image.size[1]) / 2)
     hand_card.paste(player_image, (player_image_x, player_image_y), player_image)
 
-    hand_card.paste(description_image, (92, 140), description_image)
-    hand_card.paste(username_image, (84, 36-1), username_image)
+    hand_card.paste(description_image, (184, 280), description_image)
+    hand_card.paste(username_image, (168, 72-2), username_image)
 
     # Displaying a preview
     st.image(hand_card)
@@ -60,7 +63,7 @@ if __name__ == "__main__":
     username_input = st.text_input("Username")
     description_input = st.text_area("Description")
 
-    image_scale = st.number_input("Player's image scale", min_value=8, max_value=256)
+    image_scale = st.number_input("Player's image scale", min_value=8, max_value=256, value=80)
 
     image_response = requests.get(MC_SKIN_RENDER_URL + username_input)
 
