@@ -14,6 +14,7 @@ def create_hand_card(username_input: str, description: str = "", player_image_wi
     # Setup
     hand_card = Image.open("template_hand.png")
     font = ImageFont.truetype("minecraftFont.ttf", 12)
+    titleFont = ImageFont.truetype("minecraftFont.ttf", 16)
 
     # Retrieving and scaling the player image
     player_image = None
@@ -30,7 +31,7 @@ def create_hand_card(username_input: str, description: str = "", player_image_wi
     description_image = Image.new("RGBA", (72, 60))
 
     temp_draw = ImageDraw.Draw(description_image)
-    temp_draw.text((0, 0), description, font=font)
+    temp_draw.text((0, 0), description, font=titleFont)
 
     # Writing the username
     username_image = Image.new("RGBA", (88, 12))
