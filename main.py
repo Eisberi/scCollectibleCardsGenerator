@@ -63,18 +63,13 @@ def load_username(username: str) -> Image:
     return username_image
 
 def load_seasons(seasons: list[str]) -> Image:
-    st.write("hello")
     seasons_image = Image.new("RGBA", (512, 512))
     for season in ALL_SEASONS:
-        st.write("hello world", season)
-        if seasons.__contains__(season):
+        if season in seasons:
             temp_image = Image.open("sprites/scSeasonRings/" + season + "_filled.png")
-            seasons_image.paste(temp_image, (0, 0), temp_image)
-            st.write(season + "writtenBecauseCool")
         else:
             temp_image = Image.open("sprites/scSeasonRings/" + season + "_empty.png")
-            seasons_image.paste(temp_image, (0, 0), temp_image)
-            st.write(season + "written")
+        seasons_image.paste(temp_image, (0, 0), temp_image)
 
     return seasons_image
 
@@ -122,4 +117,5 @@ if __name__ == "__main__":
 
     image_response = requests.get(MC_SKIN_RENDER_URL + username_input)
 
-    create_hand_card(username_input, seasons_input=seasons_input, description=description_input, player_image_width=image_scale)
+    seasons_mapped = [SEASON_SELECTION_MAP[s] for s in seasons_input]
+    create_hand_card(username_input, seasons_input=seasons_mapped, description=description_input, player_image_width=image_scale)
